@@ -72,7 +72,7 @@ function add_qpterms!(model, H::Matrix{Float64}) # H must be symmetric
     n = num_var(model)
     size(H) == (n, n) || error("H must be an n-by-n symmetric matrix.")
     
-    nmax = int(n * (n + 1) / 2)
+    nmax = Int(n * (n + 1) / 2)
     qr = Array(Cint, nmax)
     qc = Array(Cint, nmax)
     qv = Array(Float64, nmax)
@@ -104,7 +104,7 @@ end
 function add_diag_qpterms!(model, hv::Real)  # all diagonal elements are H
     n = num_var(model)
     q = [convert(Cint,1):convert(Cint,n)]
-    add_qpterms!(model, q, q, fill(float64(hv), n))
+    add_qpterms!(model, q, q, fill(Float64(hv), n))
 end
 
 
@@ -130,7 +130,7 @@ function add_qconstr!(model::Model, lind::IVec, lval::FVec, qr::IVec, qc::IVec, 
                           Ptr{Cint},    # qrow
                           Ptr{Cint},    # qcol
                           Ptr{Float64}, # qval
-                          Ptr{Uint8}    # name
+                          Ptr{UInt8}    # name
                           ), 
                           model.env.ptr, model.lp, lnnz, qnnz, rhs, rel, lind.-1, lval, qr.-1, qc.-1, qv, C_NULL)
         if stat != 0
@@ -143,7 +143,7 @@ end
 
 const sensemap = Compat.@compat Dict('=' => 'E', '<' => 'L', '>' => 'G')
 function add_qconstr!(model::Model, lind::Vector, lval::Vector, qr::Vector, qc::Vector, qv::Vector{Float64}, rel::GChars, rhs::Real)
-    add_qconstr!(model, ivec(lind), fvec(lval), ivec(qr), ivec(qc), fvec(qv), cchar(sensemap[rel]), float64(rhs))
+    add_qconstr!(model, ivec(lind), fvec(lval), ivec(qr), ivec(qc), fvec(qv), cchar(sensemap[rel]), Float64(rhs))
 end
 
 function num_qconstr(model::Model)
